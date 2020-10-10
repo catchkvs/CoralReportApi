@@ -1,0 +1,59 @@
+{
+  "name":"Restaurant_Monthly_Report",
+  "queries":[
+    {
+      "name":"monthly-total-sum",
+      "query":"SELECT sum(totalAmountCents)/100 FROM `demo.order_invoice` where orderMonth=${ORDER_MONTH} and orderYear=${ORDER_YEAR} and restaurantId=${RESTAURANT_ID} and orderStatus='DELIVERED' LIMIT 1000",
+      "params":[
+        {
+          "name":"ORDER_MONTH",
+          "type":"INT"
+        },
+        {
+          "name":"ORDER_MONTH",
+          "type":"INT"
+        },
+        {
+          "name":"RESTAURANT_ID",
+          "type":"STRING"
+        }
+      ]
+    },
+    {
+      "name":"monthly-order-count",
+      "query":"SELECT count(*) FROM `demo.order_invoice` where orderMonth=${ORDER_MONTH} and orderYear=${ORDER_YEAR} and restaurantId=${RESTAURANT_ID} and orderStatus='DELIVERED' LIMIT 1000",
+      "params":[
+        {
+          "name":"ORDER_MONTH",
+          "type":"INT"
+        },
+        {
+          "name":"ORDER_MONTH",
+          "type":"INT"
+        },
+        {
+          "name":"RESTAURANT_ID",
+          "type":"STRING"
+        }
+      ]
+    },
+    {
+      "name":"monthly-item-popularity",
+      "query":"SELECT name, sum(quantity) as itemCount FROM `demo.order_items` where orderMonth=${ORDER_MONTH} and orderYear=${ORDER_YEAR} and restaurantId=${RESTAURANT_ID} and orderStatus='DELIVERED' group by name order by itemCount desc limit 15",
+      "params":[
+        {
+          "name":"ORDER_MONTH",
+          "type":"INT"
+        },
+        {
+          "name":"ORDER_MONTH",
+          "type":"INT"
+        },
+        {
+          "name":"RESTAURANT_ID",
+          "type":"STRING"
+        }
+      ]
+    }
+  ]
+}
