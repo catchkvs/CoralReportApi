@@ -1,5 +1,7 @@
 {
   "name":"Restaurant_Monthly_Report",
+  "dimensionName": "restaurantId",
+  "dimensionValues": ["1231121", "1231121", "1231121", "1231121"],
   "queries":[
     {
       "name":"monthly-total-sum",
@@ -17,7 +19,8 @@
           "name":"RESTAURANT_ID",
           "type":"STRING"
         }
-      ]
+      ],
+      "resultType": "SUM"
     },
     {
       "name":"monthly-order-count",
@@ -35,7 +38,8 @@
           "name":"RESTAURANT_ID",
           "type":"STRING"
         }
-      ]
+      ],
+      "resultType": "COUNT"
     },
     {
       "name":"monthly-item-popularity",
@@ -53,7 +57,8 @@
           "name":"RESTAURANT_ID",
           "type":"STRING"
         }
-      ]
+      ],
+      "resultType": "NAME_SUM"
     }
   ]
 }

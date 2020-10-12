@@ -1,7 +1,7 @@
 package main
 
 import (
-	"k8scale.io/coral-report-api/pkg/report"
+	"k8scale.io/coral/reportgen/pkg/report"
 	"log"
 	"net/http"
 )

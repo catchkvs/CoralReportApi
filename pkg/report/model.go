@@ -2,6 +2,8 @@ package report
 
 type ReportQuery struct {
 	ReportName string
+	DimensionName string
+	DimensionValues []string
 	Queries []NamedQuery
 }
 
@@ -9,6 +11,20 @@ type NamedQuery struct {
 	Name string
 	Query string
 	Params []QueryParam
+	ResultType string
+}
+
+type SumType struct {
+	Sum int
+}
+
+type CountType struct {
+	Count int
+}
+
+type NameSumType struct {
+	Name string
+	Count int
 }
 
 type QueryParam struct {

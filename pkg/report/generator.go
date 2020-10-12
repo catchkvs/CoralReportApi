@@ -3,17 +3,29 @@ package report
 import (
 	"context"
 	"encoding/json"
+	"io/ioutil"
 	"log"
    "cloud.google.com/go/bigquery"
 )
 
+var client *bigquery.Client
+
 func init() {
-	log.Println("Creating storage bucket instance")
+	log.Println("Initialize report generator")
 	ctx := context.Background()
-	client, err := bigquery.NewClient(ctx, projectID)
+	projectID := ""
+	client, _ = bigquery.NewClient(ctx, projectID)
+}
+
+func GenerateReport(reportName string) {
+	reportFile := "resource/" + reportName + ".json"
+	data, err := ioutil.ReadFile(reportFile)
 	if err != nil {
-		// TODO: Handle error.
+		log.Fatal(err)
 	}
+	reportQuery := ReportQuery{}
+	json.Unmarshal(data, &reportQuery)
+	log.Println(reportQuery)
 }
 
 
