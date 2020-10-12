@@ -32,6 +32,16 @@ type QueryParam struct {
 	Type string
 }
 
+type IntParam struct {
+	Name string
+	Value int
+}
+
+type StringParam struct {
+	Name string
+	Value string
+}
+
 type DailyReport struct {
 	Name string
 	Summaries []DailySummary
