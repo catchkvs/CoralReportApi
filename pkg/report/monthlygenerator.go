@@ -1,13 +1,14 @@
 package report
 
 import (
+	"cloud.google.com/go/bigquery"
 	"context"
-	"encoding/json"
 	"google.golang.org/api/iterator"
-	"io/ioutil"
+	"k8scale.io/coral/reportgen/pkg/config"
 	"log"
-   "cloud.google.com/go/bigquery"
+	"strconv"
 	"strings"
+	"time"
 )
 
 var client *bigquery.Client
@@ -15,27 +16,39 @@ var ctx = context.Background()
 
 func init() {
 	log.Println("Initialize report generator")
-	projectID := ""
-	client, _ = bigquery.NewClient(ctx, projectID)
+	projectId := config.GetProperty("coral.reportapi.projectid")
+	client, _ = bigquery.NewClient(ctx, projectId)
 }
 
-func GenerateCurrentMonthReport(reportName string, params map[string] string) {
-	reportFile := "resource/" + reportName + ".json"
-	data, err := ioutil.ReadFile(reportFile)
+func GenerateCurrentMonthReport(query Query) {
+	log.Println("Initialize report generator")
+	projectId := config.GetProperty("coral.reportapi.projectid")
+	var err error
+	client, err = bigquery.NewClient(ctx, projectId)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("Error initializing client %s", err.Error())
 	}
-	reportQuery := ReportQuery{}
-	json.Unmarshal(data, &reportQuery)
-	log.Println(reportQuery)
-	for idx, query := range reportQuery.Queries {
-		log.Println("Running the query : ", idx)
-		for _, param := range query.Params {
-			paramStr := "${" + param.Name + "}"
-			query.Query = strings.Replace(query.Query, paramStr, params[paramStr], 1 )
+
+	WildCards := [7]string{"${CURRENT_YEAR}", "${CURRENT_MONTH}", "${CURRENT_DAY_OF_MONTH}", "${CURRENT_DAY_OF_WEEK}", "${CURRENT_HOUR_OF_DAY}", "${CURRENT_MINUTE_OF_HOUR}", "${CURRENT_SECOND_OF_MINUTE}"}
+	time.Now().Second()
+	for _, wildcard := range WildCards {
+		switch wildcard {
+		case "${CURRENT_YEAR}":
+			query.Query = strings.Replace(query.Query, wildcard, strconv.Itoa(time.Now().Year()), 1)
+		case "${CURRENT_MONTH}":
+			query.Query = strings.Replace(query.Query, wildcard, strconv.Itoa(int(time.Now().Month())), 1)
+		case "${CURRENT_DAY_OF_MONTH}":
+			query.Query = strings.Replace(query.Query, wildcard, strconv.Itoa(time.Now().Day()), 1)
+		case "${CURRENT_HOUR_OF_DAY}":
+			query.Query = strings.Replace(query.Query, wildcard, strconv.Itoa(time.Now().Hour()), 1)
+		case "${CURRENT_MINUTE_OF_HOUR}":
+			query.Query = strings.Replace(query.Query, wildcard, strconv.Itoa(time.Now().Minute()), 1)
+		case "${CURRENT_SECOND_OF_MINUTE}":
+			query.Query = strings.Replace(query.Query, wildcard, strconv.Itoa(time.Now().Second()), 1)
 		}
-		RunQuery(query.Query)
 	}
+	log.Printf("Query after replacements %s", query.Query)
+	RunQuery(query.Query)
 }
 
 func RunQuery(query string) {
@@ -57,5 +70,3 @@ func RunQuery(query string) {
 		log.Println(values)
 	}
 }
-
-
