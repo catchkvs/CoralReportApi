@@ -85,3 +85,21 @@ type MonthlySummary struct {
 	Count int
 	WeeklySummaries []WeeklySummary
 }
+
+type CreateReportRequest struct {
+	Name            string       `form:"Name" json:"Name" binding:"required"`
+	Query           string       `form:"Query" json:"Query" binding:"required"`
+	Params          []QueryParam `form:"Params" json:"Params" binding:"required"`
+	ResultType      string       `form:"ResultType" json:"ResultType" binding:"required"`
+	DimensionName   string       `form:"DimensionName" json:"DimensionName" binding:"required"`
+	DimensionValues []string     `form:"DimensionValues" json:"DimensionValues" binding:"required"`
+}
+
+type Query struct {
+	Id              string
+	Query           string
+	QueryParams     []QueryParam
+	DimensionName   string
+	DimensionValues []string
+}
+

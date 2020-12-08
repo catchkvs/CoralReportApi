@@ -17,7 +17,9 @@ func init() {
 	}
 	log.Println("Loading the properties for profile: " + PROFILE)
 	PROPERTIES = properties.MustLoadFile("resources/application-"+PROFILE+".properties", properties.UTF8)
+}
 
-
+func GetProperty(propertyKey string) string {
+	return properties.MustLoadFile("resources/application-"+PROFILE+".properties", properties.UTF8).MustGetString(propertyKey)
 }
 
