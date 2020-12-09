@@ -16,11 +16,12 @@ func NewQueryStorage() *QueryStorage {
 	}
 }
 
-func (storage *QueryStorage) AddQuery(query string, params []QueryParam, dimensionName string, dimensionValues []string) string {
+func (storage *QueryStorage) AddQuery(query string, params []QueryParam, dimensionName string, dimensionValues []string) Query {
 	random, _ := uuid.NewRandom()
 	randomId := random.String()
-	storage.queries = append(storage.queries, &Query{Id: randomId, Query: query, QueryParams: params, DimensionName: dimensionName, DimensionValues: dimensionValues})
-	return randomId
+	q := Query{Id: randomId, Query: query, QueryParams: params, DimensionName: dimensionName, DimensionValues: dimensionValues}
+	storage.queries = append(storage.queries, &q)
+	return q
 }
 
 func (storage *QueryStorage) GetQuery(id string) *Query {

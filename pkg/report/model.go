@@ -1,16 +1,16 @@
 package report
 
 type ReportQuery struct {
-	ReportName string
-	DimensionName string
+	ReportName      string
+	DimensionName   string
 	DimensionValues []string
-	Queries []NamedQuery
+	Queries         []NamedQuery
 }
 
 type NamedQuery struct {
-	Name string
-	Query string
-	Params []QueryParam
+	Name       string
+	Query      string
+	Params     []QueryParam
 	ResultType string
 }
 
@@ -23,7 +23,7 @@ type CountType struct {
 }
 
 type NameSumType struct {
-	Name string
+	Name  string
 	Count int
 }
 
@@ -33,56 +33,55 @@ type QueryParam struct {
 }
 
 type IntParam struct {
-	Name string
+	Name  string
 	Value int
 }
 
 type StringParam struct {
-	Name string
+	Name  string
 	Value string
 }
 
 type DailyReport struct {
-	Name string
+	Name      string
 	Summaries []DailySummary
 }
 
 type WeeklyReport struct {
-	Name string
+	Name      string
 	Summaries []WeeklySummary
 }
 
 type MonthlyReport struct {
-	Name string
+	Name      string
 	Summaries []MonthlySummary
 }
 
 type DailySummary struct {
-	Name string
+	Name       string
 	DayOfMonth int
-	DayOfWeek string
-	Year int
-	Month int
-	Count int
+	DayOfWeek  string
+	Year       int
+	Month      int
+	Count      int
 }
 
 type WeeklySummary struct {
-	Name string
-	Category string
-	WeekNumber int
-	Year int
-	Month int
-	Count int
+	Name           string
+	Category       string
+	WeekNumber     int
+	Year           int
+	Month          int
+	Count          int
 	DailySummaries []DailySummary
 }
 
-
 type MonthlySummary struct {
-	Name string
-	Category string
-	Month string
-	Year int
-	Count int
+	Name            string
+	Category        string
+	Month           string
+	Year            int
+	Count           int
 	WeeklySummaries []WeeklySummary
 }
 
@@ -93,6 +92,7 @@ type CreateReportRequest struct {
 	ResultType      string       `form:"ResultType" json:"ResultType" binding:"required"`
 	DimensionName   string       `form:"DimensionName" json:"DimensionName" binding:"required"`
 	DimensionValues []string     `form:"DimensionValues" json:"DimensionValues" binding:"required"`
+	Cron            string       `form:"Cron" json:"Cron" binding:"required"`
 }
 
 type Query struct {
@@ -103,3 +103,7 @@ type Query struct {
 	DimensionValues []string
 }
 
+type ScheduledQuery struct {
+	Query Query
+	Cron  string
+}
