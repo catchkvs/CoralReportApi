@@ -3,6 +3,7 @@ package report
 import (
 	"cloud.google.com/go/bigquery"
 	"context"
+	"encoding/json"
 	"google.golang.org/api/iterator"
 	"k8scale.io/coral/reportgen/pkg/config"
 	"log"
@@ -48,25 +49,31 @@ func GenerateCurrentMonthReport(query Query) {
 		}
 	}
 	log.Printf("Query after replacements %s", query.Query)
-	RunQuery(query.Query)
+	RunQuery(query)
 }
 
-func RunQuery(query string) {
-	q := client.Query(query)
-	q.Read(ctx)
+func RunQuery(query Query) {
+	q := client.Query(query.Query)
 	it, err := q.Read(ctx)
 	if err != nil {
-		log.Print(err)
+		log.Fatalf("Error running query %s - %s", query, err.Error())
 	}
+	var result []map[string]bigquery.Value
 	for {
-		var values []bigquery.Value
-		err := it.Next(&values)
+		row := make(map[string]bigquery.Value)
+		err := it.Next(&row)
 		if err == iterator.Done {
 			break
 		}
 		if err != nil {
-			// TODO: Handle error.
+			log.Fatalf("Error reading iterator %s", err.Error())
 		}
-		log.Println(values)
+		log.Printf("row %v", row)
+		result = append(result, row)
 	}
+	content, err := json.Marshal(result)
+	if err != nil {
+		log.Fatalf("Error marshalling records to json %s", err.Error())
+	}
+	Put(query.Id, string(content))
 }

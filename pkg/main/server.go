@@ -1,6 +1,8 @@
 package main
 
 import (
+	"cloud.google.com/go/bigquery"
+	"encoding/json"
 	"github.com/gin-gonic/gin"
 	"k8scale.io/coral/reportgen/pkg/report"
 	"log"
@@ -30,7 +32,24 @@ func main() {
 		query := storage.GetQuery(request.Id)
 		report.GenerateCurrentMonthReport(*query)
 	})
-	router.GET("/api/v1/view-report", viewReportHandler)
+
+	router.GET("/api/v1/view-report", func(context *gin.Context) {
+		var request ViewQueryReportRequest
+		if err := context.ShouldBindQuery(&request); err != nil {
+			context.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		}
+		result, err := report.Get(request.Id)
+		if err != nil {
+			context.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		}
+		var decoded []map[string]bigquery.Value
+		err = json.Unmarshal([]byte(result), &decoded)
+		if err != nil {
+			log.Printf("Error unmarshalling the stored result")
+			context.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		}
+		context.JSON(http.StatusOK, gin.H{"report": decoded})
+	})
 	log.Fatal(router.Run(":8080"))
 }
 
@@ -38,9 +57,6 @@ type ReportGenerateRequest struct {
 	Id string `form:"Id" json:"Id" binding:"required"`
 }
 
-func reportCreateHandler(context *gin.Context) {
-
-}
-
-func viewReportHandler(context *gin.Context) {
+type ViewQueryReportRequest struct {
+	Id string `form:"Id" json:"Id" binding:"required"`
 }
