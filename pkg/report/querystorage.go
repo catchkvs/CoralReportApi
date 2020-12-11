@@ -32,6 +32,6 @@ func (storage *QueryStorage) GetQuery(id string) *Query {
 			return query
 		}
 	}
-	log.Fatalf("No query found with Id")
+	log.Printf("No query found with Id %s", id)
 	return &Query{}
 }

@@ -1,14 +1,15 @@
 package report
 
 import (
-	badger "github.com/dgraph-io/badger/v2"
+	"github.com/dgraph-io/badger/v2"
 	"log"
 )
 
-func Put(k string, v string)  {
+func Put(k string, v string) error {
 	db, err := badger.Open(badger.DefaultOptions("/tmp/badger"))
 	if err != nil {
-		log.Fatal(err)
+		log.Printf("Error opening database %s", err.Error())
+		return err
 	}
 	defer db.Close()
 
@@ -24,13 +25,16 @@ func Put(k string, v string)  {
 	})
 	if err != nil {
 		log.Printf("Key %s value %s successfully stored in db", k, v)
+		return err
 	}
+	return nil
 }
 
 func Get(k string) (string, error) {
 	db, err := badger.Open(badger.DefaultOptions("/tmp/badger"))
 	if err != nil {
-		log.Fatal(err)
+		log.Printf("Error opening database %s", err.Error())
+		return "", err
 	}
 	defer db.Close()
 	var value []byte

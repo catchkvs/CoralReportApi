@@ -27,7 +27,8 @@ func GenerateCurrentMonthReport(query Query) {
 	var err error
 	client, err = bigquery.NewClient(ctx, projectId)
 	if err != nil {
-		log.Fatalf("Error initializing client %s", err.Error())
+		log.Printf("Error initializing client %s", err.Error())
+		return
 	}
 
 	WildCards := [7]string{"${CURRENT_YEAR}", "${CURRENT_MONTH}", "${CURRENT_DAY_OF_MONTH}", "${CURRENT_DAY_OF_WEEK}", "${CURRENT_HOUR_OF_DAY}", "${CURRENT_MINUTE_OF_HOUR}", "${CURRENT_SECOND_OF_MINUTE}"}
@@ -56,7 +57,8 @@ func RunQuery(query Query) {
 	q := client.Query(query.Query)
 	it, err := q.Read(ctx)
 	if err != nil {
-		log.Fatalf("Error running query %s - %s", query, err.Error())
+		log.Printf("Error running query %s - %s", query, err.Error())
+		return
 	}
 	var result []map[string]bigquery.Value
 	for {
@@ -66,14 +68,19 @@ func RunQuery(query Query) {
 			break
 		}
 		if err != nil {
-			log.Fatalf("Error reading iterator %s", err.Error())
+			log.Printf("Error reading iterator %s", err.Error())
+			return
 		}
-		log.Printf("row %v", row)
 		result = append(result, row)
 	}
 	content, err := json.Marshal(result)
 	if err != nil {
-		log.Fatalf("Error marshalling records to json %s", err.Error())
+		log.Printf("Error marshalling records to json %s", err.Error())
+		return
 	}
-	Put(query.Id, string(content))
+	err = Put(query.Id, string(content))
+	if err != nil {
+		log.Printf("Error storing query result for id %s", query.Id)
+		return
+	}
 }
