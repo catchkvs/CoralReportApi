@@ -1,12 +1,13 @@
 package report
 
 import (
+	"fmt"
 	"github.com/go-co-op/gocron"
 	"log"
 	"time"
 )
 
-func Schedule(scheduledQuery ScheduledQuery)  {
+func Schedule(scheduledQuery ScheduledQuery) error {
 	cron := scheduledQuery.Cron
 	s1 := gocron.NewScheduler(time.UTC)
 	s1.StartAsync()
@@ -20,23 +21,28 @@ func Schedule(scheduledQuery ScheduledQuery)  {
 		_, err := s1.Every(1).Week().Do(GenerateCurrentMonthReport, scheduledQuery.Query)
 		if err != nil {
 			log.Printf("Error add query to schedule. Query %s %s", scheduledQuery.Query.Id, err.Error())
+			return err
 		}
 	case "DAILY":
 		_, err := s1.Every(1).Day().Do(GenerateCurrentMonthReport, scheduledQuery.Query)
 		if err != nil {
 			log.Printf("Error add query to schedule. Query %s %s", scheduledQuery.Query.Id, err.Error())
+			return err
 		}
 	case "HOURLY":
 		_, err := s1.Every(1).Hour().Do(GenerateCurrentMonthReport, scheduledQuery.Query)
 		if err != nil {
 			log.Printf("Error add query to schedule. Query %s %s", scheduledQuery.Query.Id, err.Error())
+			return err
 		}
 	case "MINUTE":
 		_, err := s1.Every(1).Minute().Do(GenerateCurrentMonthReport, scheduledQuery.Query)
 		if err != nil {
 			log.Printf("Error add query to schedule. Query %s %s", scheduledQuery.Query.Id, err.Error())
+			return err
 		}
 	default:
-		log.Printf("Schedule %s not supported", cron)
+		return fmt.Errorf("Schedule %s not supported", cron)
 	}
+	return nil
 }

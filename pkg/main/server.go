@@ -20,7 +20,9 @@ func main() {
 		query := storage.AddQuery(request.Query, request.Params, request.DimensionName, request.DimensionValues)
 		log.Printf("Stored query %s", query.Id)
 		scheduledQuery := report.ScheduledQuery{Query: query, Cron: request.Cron}
-		report.Schedule(scheduledQuery)
+		if err := report.Schedule(scheduledQuery); err != nil {
+			context.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		}
 		context.JSON(http.StatusOK, gin.H{"Id": query.Id})
 	})
 
