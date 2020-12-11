@@ -5,7 +5,7 @@
   "queries":[
     {
       "name":"monthly-total-sum",
-      "query":"SELECT sum(totalAmountCents)/100 FROM `demo.order_invoice` where orderMonth=${ORDER_MONTH} and orderYear=${ORDER_YEAR} and restaurantId=${RESTAURANT_ID} and orderStatus='DELIVERED' LIMIT 1000",
+      "query":"SELECT sum(subTotalCents)/100 FROM `coralreportapi.order.test` where orderMonth=${ORDER_MONTH} and orderYear=${ORDER_YEAR} and restaurantId=${RESTAURANT_ID} and orderStatus='DELIVERED' LIMIT 1000",
       "params":[
         {
           "name":"ORDER_MONTH",

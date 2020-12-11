@@ -3,6 +3,7 @@ package report
 import (
 	"cloud.google.com/go/bigquery"
 	"context"
+	"encoding/json"
 	"google.golang.org/api/iterator"
 	"k8scale.io/coral/reportgen/pkg/config"
 	"log"
@@ -26,7 +27,8 @@ func GenerateCurrentMonthReport(query Query) {
 	var err error
 	client, err = bigquery.NewClient(ctx, projectId)
 	if err != nil {
-		log.Fatalf("Error initializing client %s", err.Error())
+		log.Printf("Error initializing client %s", err.Error())
+		return
 	}
 
 	WildCards := [7]string{"${CURRENT_YEAR}", "${CURRENT_MONTH}", "${CURRENT_DAY_OF_MONTH}", "${CURRENT_DAY_OF_WEEK}", "${CURRENT_HOUR_OF_DAY}", "${CURRENT_MINUTE_OF_HOUR}", "${CURRENT_SECOND_OF_MINUTE}"}
@@ -48,25 +50,37 @@ func GenerateCurrentMonthReport(query Query) {
 		}
 	}
 	log.Printf("Query after replacements %s", query.Query)
-	RunQuery(query.Query)
+	RunQuery(query)
 }
 
-func RunQuery(query string) {
-	q := client.Query(query)
-	q.Read(ctx)
+func RunQuery(query Query) {
+	q := client.Query(query.Query)
 	it, err := q.Read(ctx)
 	if err != nil {
-		log.Print(err)
+		log.Printf("Error running query %s - %s", query, err.Error())
+		return
 	}
+	var result []map[string]bigquery.Value
 	for {
-		var values []bigquery.Value
-		err := it.Next(&values)
+		row := make(map[string]bigquery.Value)
+		err := it.Next(&row)
 		if err == iterator.Done {
 			break
 		}
 		if err != nil {
-			// TODO: Handle error.
+			log.Printf("Error reading iterator %s", err.Error())
+			return
 		}
-		log.Println(values)
+		result = append(result, row)
+	}
+	content, err := json.Marshal(result)
+	if err != nil {
+		log.Printf("Error marshalling records to json %s", err.Error())
+		return
+	}
+	err = Put(query.Id, string(content))
+	if err != nil {
+		log.Printf("Error storing query result for id %s", query.Id)
+		return
 	}
 }
