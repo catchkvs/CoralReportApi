@@ -17,7 +17,7 @@ func main() {
 		if err := context.ShouldBindJSON(&request); err != nil {
 			context.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		}
-		query := storage.AddQuery(request.Query, request.Params, request.DimensionName, request.DimensionValues)
+		query := storage.AddQuery(request)
 		log.Printf("Stored query %s", query.Id)
 		scheduledQuery := report.ScheduledQuery{Query: query, Cron: request.Cron}
 		if err := report.Schedule(scheduledQuery); err != nil {
@@ -36,7 +36,7 @@ func main() {
 	})
 
 	router.GET("/api/v1/view-report", func(context *gin.Context) {
-		var request ViewQueryReportRequest
+		var request report.ViewQueryReportRequest
 		if err := context.ShouldBindQuery(&request); err != nil {
 			context.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		}
@@ -59,6 +59,3 @@ type ReportGenerateRequest struct {
 	Id string `form:"Id" json:"Id" binding:"required"`
 }
 
-type ViewQueryReportRequest struct {
-	Id string `form:"Id" json:"Id" binding:"required"`
-}

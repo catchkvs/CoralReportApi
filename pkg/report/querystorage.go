@@ -16,10 +16,10 @@ func NewQueryStorage() *QueryStorage {
 	}
 }
 
-func (storage *QueryStorage) AddQuery(query string, params []QueryParam, dimensionName string, dimensionValues []string) Query {
+func (storage *QueryStorage) AddQuery(request CreateReportRequest) Query {
 	random, _ := uuid.NewRandom()
 	randomId := random.String()
-	q := Query{Id: randomId, Query: query, QueryParams: params, DimensionName: dimensionName, DimensionValues: dimensionValues}
+	q := Query{Id: randomId, Query: request.Query, Dimension: request.Dimension}
 	storage.queries = append(storage.queries, &q)
 	return q
 }

@@ -12,19 +12,11 @@ func Put(k string, v string) error {
 		return err
 	}
 	defer db.Close()
-
 	err = db.Update(func(txn *badger.Txn) error {
-		err = txn.Set([]byte(k), []byte(v))
-		err = txn.Commit()
-		if err != nil {
-			log.Printf("Error writing result to db %s", err)
-			return err
-		}
-		// Your code here…
-		return nil
+		return txn.Set([]byte(k), []byte(v))
 	})
 	if err != nil {
-		log.Printf("Key %s value %s successfully stored in db", k, v)
+		log.Printf("Key %s value %s failed to store in db %s", k, v, err.Error())
 		return err
 	}
 	return nil
