@@ -81,23 +81,24 @@ type MonthlySummary struct {
 }
 
 type CreateReportRequest struct {
-	Name            string
-	Query           string
-	ResultType      string
-	Dimension QueryDimension
-	Cron            string
+	Name       string
+	Query      string
+	ResultType string
+	Dimension  QueryDimension
+	Cron       string
 }
 
 type QueryDimension struct {
-	Name string
-	Type string
+	Name   string
+	Type   string
 	Values []string
 }
 
 type Query struct {
-	Id          string
-	Query       string
-	Dimension   QueryDimension
+	Id        string
+	Query     string
+	Dimension QueryDimension
+	Cron      string
 }
 
 type ScheduledQuery struct {
@@ -106,8 +107,8 @@ type ScheduledQuery struct {
 }
 
 type ViewReportRequest struct {
-	Id string
-	DimensionName string
+	Id             string
+	DimensionName  string
 	DimensionValue string
 }
 
@@ -115,3 +116,6 @@ type GenerateReportRequest struct {
 	Id string
 }
 
+type DeleteReportRequest struct {
+	Id string
+}

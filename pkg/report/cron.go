@@ -7,10 +7,17 @@ import (
 	"time"
 )
 
-func Schedule(query Query, cron string) (*gocron.Job, error) {
-	scheduler := gocron.NewScheduler(time.UTC)
-	scheduler.StartAsync()
-	switch cron {
+var scheduler *gocron.Scheduler
+
+func InitScheduler() *gocron.Scheduler {
+	s := gocron.NewScheduler(time.UTC)
+	s.StartAsync()
+	scheduler = s
+	return s
+}
+
+func Schedule(query Query) (*gocron.Job, error) {
+	switch query.Cron {
 	case "MONTHLY":
 		job, err := scheduler.Every(1).Month(1).Do(GenerateReport, query)
 		if err != nil {
@@ -47,6 +54,6 @@ func Schedule(query Query, cron string) (*gocron.Job, error) {
 		}
 		return job, err
 	default:
-		return nil, fmt.Errorf("schedule %s not supported", cron)
+		return nil, fmt.Errorf("schedule %s not supported", query.Cron)
 	}
 }
