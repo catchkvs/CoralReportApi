@@ -7,42 +7,46 @@ import (
 	"time"
 )
 
-func Schedule(scheduledQuery ScheduledQuery) error {
-	cron := scheduledQuery.Cron
-	s1 := gocron.NewScheduler(time.UTC)
-	s1.StartAsync()
+func Schedule(query Query, cron string) (*gocron.Job, error) {
+	scheduler := gocron.NewScheduler(time.UTC)
+	scheduler.StartAsync()
 	switch cron {
 	case "MONTHLY":
-		_, err := s1.Every(1).Month(1).Do(GenerateCurrentMonthReport, scheduledQuery.Query)
+		job, err := scheduler.Every(1).Month(1).Do(GenerateReport, query)
 		if err != nil {
-			log.Printf("Error add query to schedule. Query %s %s", scheduledQuery.Query.Id, err.Error())
+			log.Printf("Error add query to schedule. Query %s %s", query.Id, err.Error())
+			return nil, err
 		}
+		return job, err
 	case "WEEKLY":
-		_, err := s1.Every(1).Week().Do(GenerateCurrentMonthReport, scheduledQuery.Query)
+		job, err := scheduler.Every(1).Week().Do(GenerateReport, query)
 		if err != nil {
-			log.Printf("Error add query to schedule. Query %s %s", scheduledQuery.Query.Id, err.Error())
-			return err
+			log.Printf("Error add query to schedule. Query %s %s", query.Id, err.Error())
+			return nil, err
 		}
+		return job, err
 	case "DAILY":
-		_, err := s1.Every(1).Day().Do(GenerateCurrentMonthReport, scheduledQuery.Query)
+		job, err := scheduler.Every(1).Day().Do(GenerateReport, query)
 		if err != nil {
-			log.Printf("Error add query to schedule. Query %s %s", scheduledQuery.Query.Id, err.Error())
-			return err
+			log.Printf("Error add query to schedule. Query %s %s", query.Id, err.Error())
+			return nil, err
 		}
+		return job, err
 	case "HOURLY":
-		_, err := s1.Every(1).Hour().Do(GenerateCurrentMonthReport, scheduledQuery.Query)
+		job, err := scheduler.Every(1).Hour().Do(GenerateReport, query)
 		if err != nil {
-			log.Printf("Error add query to schedule. Query %s %s", scheduledQuery.Query.Id, err.Error())
-			return err
+			log.Printf("Error add query to schedule. Query %s %s", query.Id, err.Error())
+			return nil, err
 		}
+		return job, err
 	case "MINUTE":
-		_, err := s1.Every(1).Minute().Do(GenerateCurrentMonthReport, scheduledQuery.Query)
+		job, err := scheduler.Every(1).Minute().Do(GenerateReport, query)
 		if err != nil {
-			log.Printf("Error add query to schedule. Query %s %s", scheduledQuery.Query.Id, err.Error())
-			return err
+			log.Printf("Error add query to schedule. Query %s %s", query.Id, err.Error())
+			return nil, err
 		}
+		return job, err
 	default:
-		return fmt.Errorf("Schedule %s not supported", cron)
+		return nil, fmt.Errorf("schedule %s not supported", cron)
 	}
-	return nil
 }

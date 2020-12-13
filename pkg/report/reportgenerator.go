@@ -21,7 +21,7 @@ func init() {
 	client, _ = bigquery.NewClient(ctx, projectId)
 }
 
-func GenerateCurrentMonthReport(query Query) {
+func GenerateReport(query Query) {
 	log.Printf("Initialize report generator for query %s", query)
 	projectId := config.GetProperty("coral.reportapi.projectid")
 	var err error
@@ -39,20 +39,20 @@ func GenerateCurrentMonthReport(query Query) {
 			for _, dv := range query.Dimension.Values {
 				query.Query = strings.Replace(query.Query, "${"+query.Dimension.Name+"}", "'"+dv+"'", 1)
 				log.Printf("Final query after all replacements %s", query.Query)
-				RunQuery(query)
+				runQuery(query, query.Dimension.Name, dv)
 			}
 		case "INT":
 			for _, dv := range query.Dimension.Values {
 				query.Query = strings.Replace(query.Query, "${"+query.Dimension.Name+"}", dv, 1)
 				log.Printf("Final query after all replacements %s", query.Query)
-				RunQuery(query)
+				runQuery(query, query.Dimension.Name, dv)
 			}
 		default:
 			log.Printf("Dimension %s not supported", query.Dimension.Type)
 		}
 	} else {
 		log.Printf("No Dimension was found, final query %s", query.Query)
-		RunQuery(query)
+		runQuery(query, "", "")
 	}
 }
 
@@ -78,7 +78,7 @@ func replaceCurrentTimeBaseWildcards(query *Query) {
 	}
 }
 
-func RunQuery(query Query) {
+func runQuery(query Query, rangeColumn string, rangeKey string) {
 	q := client.Query(query.Query)
 	it, err := q.Read(ctx)
 	if err != nil {
@@ -104,7 +104,11 @@ func RunQuery(query Query) {
 		return
 	}
 	log.Printf("Query result %s", content)
-	err = Put(query.Id, string(content))
+	if rangeColumn != "" {
+		err = Put(query.Id+"#"+rangeColumn+"#"+rangeKey, string(content))
+	} else {
+		err = Put(query.Id, string(content))
+	}
 	if err != nil {
 		log.Printf("Error storing query result for id %s %s", query.Id, err.Error())
 		return

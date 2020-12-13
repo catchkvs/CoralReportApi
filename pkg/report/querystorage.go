@@ -1,37 +1,32 @@
 package report
 
 import (
-	"github.com/google/uuid"
 	"log"
 	"strings"
 )
 
 type QueryStorage struct {
-	queries []*Query
+	queries []*ScheduledQuery
 }
 
 func NewQueryStorage() *QueryStorage {
 	return &QueryStorage{
-		queries: make([]*Query, 0),
+		queries: make([]*ScheduledQuery, 0),
 	}
 }
 
-func (storage *QueryStorage) AddQuery(request CreateReportRequest) Query {
-	random, _ := uuid.NewRandom()
-	randomId := random.String()
-	q := Query{Id: randomId, Query: request.Query, Dimension: request.Dimension}
-	storage.queries = append(storage.queries, &q)
-	return q
+func (storage *QueryStorage) AddQuery(scheduledQuery *ScheduledQuery) {
+	storage.queries = append(storage.queries, scheduledQuery)
 }
 
-func (storage *QueryStorage) GetQuery(id string) *Query {
+func (storage *QueryStorage) GetQuery(id string) *ScheduledQuery {
 	log.Printf("queries present right now %d", len(storage.queries))
-	for _, query := range storage.queries {
-		log.Printf("Id - %s. Incoming Id %s", query.Id, id)
-		if strings.Compare(id, query.Id) == 0 {
-			return query
+	for _, scheduledQuery := range storage.queries {
+		log.Printf("Id - %s. Incoming Id %s", scheduledQuery.Query.Id, id)
+		if strings.Compare(id, scheduledQuery.Query.Id) == 0 {
+			return scheduledQuery
 		}
 	}
-	log.Printf("No query found with Id %s", id)
-	return &Query{}
+	log.Printf("No scheduledQuery found with Id %s", id)
+	return &ScheduledQuery{}
 }

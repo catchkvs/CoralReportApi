@@ -1,11 +1,6 @@
 package report
 
-type ReportQuery struct {
-	ReportName      string
-	DimensionName   string
-	DimensionValues []string
-	Queries         []NamedQuery
-}
+import "github.com/go-co-op/gocron"
 
 type NamedQuery struct {
 	Name       string
@@ -106,10 +101,17 @@ type Query struct {
 }
 
 type ScheduledQuery struct {
-	Query Query
-	Cron  string
+	Query        Query
+	ScheduledJob *gocron.Job
 }
 
-type ViewQueryReportRequest struct {
+type ViewReportRequest struct {
+	Id string
+	DimensionName string
+	DimensionValue string
+}
+
+type GenerateReportRequest struct {
 	Id string
 }
+

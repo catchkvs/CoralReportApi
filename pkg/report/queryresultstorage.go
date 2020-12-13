@@ -12,6 +12,7 @@ func Put(k string, v string) error {
 		return err
 	}
 	defer db.Close()
+
 	err = db.Update(func(txn *badger.Txn) error {
 		return txn.Set([]byte(k), []byte(v))
 	})
@@ -29,6 +30,8 @@ func Get(k string) (string, error) {
 		return "", err
 	}
 	defer db.Close()
+
+
 	var value []byte
 
 	err = db.View(func(txn *badger.Txn) error {
