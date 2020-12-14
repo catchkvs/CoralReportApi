@@ -1,11 +1,11 @@
 {
   "name":"Restaurant_Monthly_Report",
-  "dimensionName": "restaurantId",
-  "dimensionValues": ["1231121", "1231121", "1231121", "1231121"],
+  "dimensionName": "RESTAURANT_ID",
+  "dimensionValues": ["R_1kJ6nYyzzI1b", "R_59DMPyJracjP"],
   "queries":[
     {
       "name":"monthly-total-sum",
-      "query":"SELECT sum(subTotalCents)/100 FROM `coralreportapi.order.test` where orderMonth=${ORDER_MONTH} and orderYear=${ORDER_YEAR} and restaurantId=${RESTAURANT_ID} and orderStatus='DELIVERED' LIMIT 1000",
+      "query":"SELECT sum(subTotalCents)/100 FROM `coralreportapi.order.test` where orderMonth=${CURRENT_MONTH} and orderYear=${CURRENT_YEAR} and restaurantId=${RESTAURANT_ID} and status='CONFIRMED' LIMIT 1000",
       "params":[
         {
           "name":"ORDER_MONTH",

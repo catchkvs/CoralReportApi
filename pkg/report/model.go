@@ -1,11 +1,6 @@
 package report
 
-type ReportQuery struct {
-	ReportName      string
-	DimensionName   string
-	DimensionValues []string
-	Queries         []NamedQuery
-}
+import "github.com/go-co-op/gocron"
 
 type NamedQuery struct {
 	Name       string
@@ -86,24 +81,41 @@ type MonthlySummary struct {
 }
 
 type CreateReportRequest struct {
-	Name            string       `form:"Name" json:"Name" binding:"required"`
-	Query           string       `form:"Query" json:"Query" binding:"required"`
-	Params          []QueryParam `form:"Params" json:"Params" binding:"required"`
-	ResultType      string       `form:"ResultType" json:"ResultType" binding:"required"`
-	DimensionName   string       `form:"DimensionName" json:"DimensionName" binding:"required"`
-	DimensionValues []string     `form:"DimensionValues" json:"DimensionValues" binding:"required"`
-	Cron            string       `form:"Cron" json:"Cron" binding:"required"`
+	Name       string
+	Query      string
+	ResultType string
+	Dimension  QueryDimension
+	Cron       string
+}
+
+type QueryDimension struct {
+	Name   string
+	Type   string
+	Values []string
 }
 
 type Query struct {
-	Id              string
-	Query           string
-	QueryParams     []QueryParam
-	DimensionName   string
-	DimensionValues []string
+	Id        string
+	Query     string
+	Dimension QueryDimension
+	Cron      string
 }
 
 type ScheduledQuery struct {
-	Query Query
-	Cron  string
+	Query        Query
+	ScheduledJob *gocron.Job
+}
+
+type ViewReportRequest struct {
+	Id             string
+	DimensionName  string
+	DimensionValue string
+}
+
+type GenerateReportRequest struct {
+	Id string
+}
+
+type DeleteReportRequest struct {
+	Id string
 }
